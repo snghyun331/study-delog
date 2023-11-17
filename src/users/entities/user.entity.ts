@@ -17,7 +17,7 @@ export class UserEntity {
   @Column({ type: 'varchar', nullable: false })
   password: string;
 
-  @Column({ type: 'varchar', nullable: false }) // default 사진 나중에 추가
+  @Column({ type: 'varchar', nullable: false })
   profileImg: string;
 
   @Column({ type: 'boolean', default: true, nullable: false })
