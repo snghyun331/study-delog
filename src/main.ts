@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
+import { SwaggerConfig } from './configs/swagger.config';
 import { AppModule } from './app.module';
 import { SERVER_PORT, SERVER_PORT_2 } from './utils/constant';
 
@@ -9,13 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // run swagger
-  const config = new DocumentBuilder()
-    .setTitle('Delog')
-    .setDescription('Delog API description')
-    .setVersion('1.0')
-    .addTag('swagger')
-    .build();
-
+  const config = new SwaggerConfig().initializeOptions();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
