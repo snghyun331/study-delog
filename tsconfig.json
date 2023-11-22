@@ -18,5 +18,5 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": ["src/**/*", "src/configs/env/.two.dev"]
+  "include": ["src/**/*"]
 }
