@@ -1,3 +1,5 @@
+import * as bcrypt from 'bcryptjs';
+import { SALT_ROUND } from 'src/utils/constant';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -15,7 +17,9 @@ export class UsersService {
       throw new UnprocessableEntityException('해당 닉네임은 이미 있습니다.');
     }
 
-    return this.saveUser(nickname, password, profileImg);
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUND);
+
+    return this.saveUser(nickname, hashedPassword, profileImg);
   }
 
   private async isUserExists(nickname: string): Promise<boolean> {
