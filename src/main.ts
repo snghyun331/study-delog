@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common/pipes';
 import { SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from './configs/swagger.config';
 import { AppModule } from './app.module';
@@ -8,6 +9,9 @@ const port = SERVER_PORT || SERVER_PORT_2;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // use global pipe
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   // run swagger
   const config = new SwaggerConfig().initializeOptions();
