@@ -20,7 +20,9 @@ async function bootstrap() {
   // run swagger
   const config = new SwaggerConfig().initializeOptions();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: { defaultModelsExpandDepth: -1 },
+  });
 
   // run server
   try {

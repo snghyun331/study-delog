@@ -8,11 +8,6 @@ export class SwaggerConfig {
       .setTitle('Delog')
       .setDescription('Delog API description')
       .setVersion('1.0')
-      .addTag('Users')
-      .addTag('Posts')
-      .addTag('PostComments')
-      .addTag('Bookmarks')
-      .addTag('Chats')
       .build();
   }
 }
