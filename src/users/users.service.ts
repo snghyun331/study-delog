@@ -25,7 +25,7 @@ export class UsersService {
       // console.error(error);
       if (error.code === '23505') {
         throw new ConflictException(
-          '이 닉네임은 현재 사용 중입니다. 다른 닉네임을 입력해주세요 ',
+          '이 닉네임은 이미 존재합니다. 다른 닉네임을 입력해주세요',
         );
       } else {
         throw new InternalServerErrorException();
