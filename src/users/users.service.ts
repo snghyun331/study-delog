@@ -22,7 +22,7 @@ export class UsersService {
       const result = await this.saveUser(nickname, hashedPassword, profileImg);
       return result;
     } catch (error) {
-      // console.error(error);
+      console.error(error);
       if (error.code === '23505') {
         throw new ConflictException(
           '이 닉네임은 이미 존재합니다. 다른 닉네임을 입력해주세요',

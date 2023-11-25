@@ -4,6 +4,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from './configs/swagger.config';
 import { AppModule } from './app.module';
 import { SERVER_PORT, SERVER_PORT_2 } from './utils/constant';
+import { TransformInterceptor } from './interceptors/response.interceptor';
 
 const port = SERVER_PORT || SERVER_PORT_2;
 
@@ -12,6 +13,9 @@ async function bootstrap() {
 
   // use global pipe
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
+  // use global interceptors
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   // run swagger
   const config = new SwaggerConfig().initializeOptions();

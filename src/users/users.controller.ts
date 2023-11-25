@@ -7,18 +7,17 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post('/signup')
-  async create(@Body() createUserDto: CreateUserDto): Promise<void> {
+  async create(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<{ message: string; result: any }> {
     const { nickname, password, profileImg } = createUserDto;
-    const savedUser = await this.usersService.createUser(
+    const result = await this.usersService.createUser(
       nickname,
       password,
       profileImg,
     );
-    return Object.assign({
-      statusCode: 201,
-      message: '회원가입이 완료되었습니다.',
-      data: savedUser,
-    });
+
+    return { message: '회원가입을 완료했습니다.', result };
   }
 
   // @Get()
