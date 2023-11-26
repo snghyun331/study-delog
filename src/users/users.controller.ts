@@ -9,18 +9,9 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @ApiOperation({ summary: '유저 회원가입 API' })
-  @ApiResponse({
-    status: 201,
-    description: '회원가입 성공',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Validation Failed',
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'Conflict Error(닉네임 중복)',
-  })
+  @ApiResponse({ status: 201, description: '회원가입 성공' })
+  @ApiResponse({ status: 400, description: 'Validation Failed' })
+  @ApiResponse({ status: 409, description: 'Conflict Error(닉네임 중복)' })
   @Post('/signup')
   async create(@Body() createUserDto: CreateUserDto): Promise<{ message: string; result: any }> {
     const { nickname, password, profileImg } = createUserDto;
