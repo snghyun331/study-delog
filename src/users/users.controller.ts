@@ -22,15 +22,9 @@ export class UsersController {
     description: 'Conflict Error(닉네임 중복)',
   })
   @Post('/signup')
-  async create(
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<{ message: string; result: any }> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<{ message: string; result: any }> {
     const { nickname, password, profileImg } = createUserDto;
-    const result = await this.usersService.createUser(
-      nickname,
-      password,
-      profileImg,
-    );
+    const result = await this.usersService.createUser(nickname, password, profileImg);
 
     return { message: '회원가입을 완료했습니다.', result };
   }

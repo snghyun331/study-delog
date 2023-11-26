@@ -1,10 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 import { SALT_ROUND } from 'src/utils/constant';
-import {
-  Injectable,
-  ConflictException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository, DataSource } from 'typeorm';
@@ -20,29 +16,19 @@ export class UsersService {
     try {
       const hashedPassword = await bcrypt.hash(password, SALT_ROUND);
 
-      const result = await this.saveUserUsingQueryRunner(
-        nickname,
-        hashedPassword,
-        profileImg,
-      );
+      const result = await this.saveUserUsingQueryRunner(nickname, hashedPassword, profileImg);
       return result;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       if (e.code === '23505') {
-        throw new ConflictException(
-          '이 닉네임은 이미 존재합니다. 다른 닉네임을 입력해주세요',
-        );
+        throw new ConflictException('이 닉네임은 이미 존재합니다. 다른 닉네임을 입력해주세요');
       } else {
         throw new InternalServerErrorException();
       }
     }
   }
 
-  private async saveUserUsingQueryRunner(
-    nickname: string,
-    password: string,
-    profileImg: string,
-  ) {
+  private async saveUserUsingQueryRunner(nickname: string, password: string, profileImg: string) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
