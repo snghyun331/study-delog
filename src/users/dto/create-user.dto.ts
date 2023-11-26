@@ -9,7 +9,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @ApiProperty({
-    description: '최소 2자 최대 10자',
+    description: '최소 2자 최대 10자, 공백X',
   })
   @IsNotEmpty({ message: '닉네임은 필수 항목입니다' })
   @IsString()
@@ -19,7 +19,7 @@ export class CreateUserDto {
   readonly nickname: string;
 
   @ApiProperty({
-    description: '비밀번호(8자이상)',
+    description: '비밀번호(8자이상,영/숫/특만 포함, 공백X)',
   })
   @IsNotEmpty({ message: '비밀번호는 필수 항목입니다' })
   @IsString()
