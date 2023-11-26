@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  Matches,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, Matches, MinLength, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -25,8 +19,7 @@ export class CreateUserDto {
   @IsString()
   @MinLength(8, { message: '비밀번호는 최소 8자 이상이어야 합니다' })
   @Matches(/^[A-Za-z\d!@#$%^&*()]*$/, {
-    message:
-      '비밀번호는 영문자, 숫자, 특수문자(!@#$%^&*())만 포함할 수 있고, 공백을 포함할 수 없습니다.',
+    message: '비밀번호는 영문자, 숫자, 특수문자(!@#$%^&*())만 포함할 수 있고, 공백을 포함할 수 없습니다.',
   })
   readonly password: string;
 
