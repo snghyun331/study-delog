@@ -54,11 +54,12 @@ export class UsersService {
       user.password = password;
       user.profileImg = profileImg;
       const result = await queryRunner.manager.save(user);
-      // throw new InternalServerErrorException();  // 트랜젹션 확인을 위해 일부러 에러를 발생시킴
+      // throw new InternalServerErrorException(); // 트랜젹션 확인을 위해 일부러 에러를 발생시킴
       await queryRunner.commitTransaction();
       return result;
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      throw e;
     } finally {
       await queryRunner.release();
     }
