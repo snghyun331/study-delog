@@ -1,9 +1,10 @@
 import * as bcrypt from 'bcryptjs';
 import { SALT_ROUND } from 'src/utils/constant';
-import { Injectable, ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository, DataSource } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +12,7 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
     private dataSource: DataSource,
+    private jwtService: JwtService,
   ) {}
 
   async createUser(nickname: string, password: string, profileImg: string) {
@@ -33,14 +35,17 @@ export class UsersService {
       const user = await this.usersRepository.findOne({ where: { nickname } });
       // console.log(user)
       if (user && (await bcrypt.compare(password, user.password))) {
-        return user;
+        const payload = { userId: user.id };
+        const token = this.jwtService.sign(payload);
+        const result = { token, ...user };
+        return result;
       } else {
-        throw new NotFoundException('아이디 또는 비밀번호가 일치하지 않습니다.');
+        throw new UnauthorizedException('아이디 또는 비밀번호가 일치하지 않습니다.');
       }
     } catch (e) {
       console.error(e);
-      if (e instanceof NotFoundException) {
-        throw e; // NotFoundException은 그대로 던지기
+      if (e instanceof UnauthorizedException) {
+        throw e; // UnauthorizedException은 그대로 던지기
       } else {
         throw new InternalServerErrorException('알 수 없는 오류');
       }

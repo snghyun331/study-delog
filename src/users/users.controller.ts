@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -23,6 +23,8 @@ export class UsersController {
 
   @ApiOperation({ summary: '유저 로그인 API' })
   @ApiResponse({ status: 200, description: '로그인 성공' })
+  @ApiResponse({ status: 401, description: '로그인 실패(아이디 혹은 비번 불일치)' })
+  @HttpCode(200)
   @Post('/signIn')
   async login(@Body() userLoginDto: UserLoginDto): Promise<{ message: string; result: any }> {
     const { nickname, password } = userLoginDto;
