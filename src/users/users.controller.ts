@@ -1,8 +1,9 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserLoginDto } from './dto/user-login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('USER')
 @Controller('users')
@@ -32,6 +33,13 @@ export class UsersController {
 
     return { message: '로그인 성공했습니다.', result };
   }
+
+  // 토큰 작동 확인용
+  // @Post('/test')
+  // @UseGuards(AuthGuard())
+  // test(@Req() req) {
+  //   console.log(req);
+  // }
 
   // @Get()
   // findAll() {
