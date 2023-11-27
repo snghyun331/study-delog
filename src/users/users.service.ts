@@ -42,7 +42,7 @@ export class UsersService {
       if (e instanceof NotFoundException) {
         throw e; // NotFoundException은 그대로 던지기
       } else {
-        throw new InternalServerErrorException('알 수 없는 오류 발생');
+        throw new InternalServerErrorException('알 수 없는 오류');
       }
     }
   }
