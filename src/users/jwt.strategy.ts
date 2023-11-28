@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
 import * as jwt from 'jsonwebtoken';
-import { TokenExpiredError } from 'jsonwebtoken';
+import { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -20,11 +20,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       const userId = payload['userId'];
       return userId;
     } catch (e) {
+      console.error(e);
       if (e instanceof BadRequestException) {
         throw e;
       }
       if (e instanceof TokenExpiredError) {
         throw new UnauthorizedException('Token is expired');
+      }
+      if (e instanceof JsonWebTokenError) {
+        // JwtWebTokenError should be later than TokenExpiredError
+        // invalid signature | invalid token (header 깨졌을 때)
+        throw new BadRequestException(e.message);
       }
       if (e instanceof SyntaxError) {
         throw new BadRequestException('Invalid JSON object');
