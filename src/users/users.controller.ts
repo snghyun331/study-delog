@@ -34,14 +34,6 @@ export class UsersController {
     return { message: '로그인 성공했습니다.', result };
   }
 
-  // @UseGuards(AuthGuard())
-  // @Get('/me')
-  // async getAuthUserInfo(@AuthUser() user: UserEntity): Promise<{ message: string; result: any }> {
-  //   const userId = user.id;
-  //   const result = await this.usersService.getAuthUserInfo(userId);
-  //   return { message: '당신의 정보를 성공적으로 가져왔습니다.', result };
-  // }
-
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   async getAuthUserInfo(@Request() req): Promise<{ message: string; result: any }> {
