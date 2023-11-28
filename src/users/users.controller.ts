@@ -1,4 +1,5 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Post, Request, Get, Body, HttpCode, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './authguards/jwt-auth.guard';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -33,15 +34,20 @@ export class UsersController {
     return { message: '로그인 성공했습니다.', result };
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.usersService.findAll();
+  // @UseGuards(AuthGuard())
+  // @Get('/me')
+  // async getAuthUserInfo(@AuthUser() user: UserEntity): Promise<{ message: string; result: any }> {
+  //   const userId = user.id;
+  //   const result = await this.usersService.getAuthUserInfo(userId);
+  //   return { message: '당신의 정보를 성공적으로 가져왔습니다.', result };
   // }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(+id);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Get('/me')
+  async getAuthUserInfo(@Request() req): Promise<{ message: string; result: any }> {
+    const result = await this.usersService.getAuthUserInfo(req.user);
+    return { message: '당신의 정보를 성공적으로 가져왔습니다.', result };
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

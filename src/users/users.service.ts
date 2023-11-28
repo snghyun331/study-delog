@@ -1,6 +1,12 @@
 import * as bcrypt from 'bcryptjs';
 import { SALT_ROUND } from 'src/utils/constant';
-import { Injectable, ConflictException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  InternalServerErrorException,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository, DataSource } from 'typeorm';
@@ -46,6 +52,22 @@ export class UsersService {
       console.error(e);
       if (e instanceof UnauthorizedException) {
         throw e; // UnauthorizedException은 그대로 던지기
+      } else {
+        throw new InternalServerErrorException('알 수 없는 오류');
+      }
+    }
+  }
+
+  async getAuthUserInfo(userId: string) {
+    try {
+      const user = await this.usersRepository.findOne({ where: { id: userId } });
+      if (!user) {
+        throw new NotFoundException('유저가 존재하지 않습니다');
+      }
+      return user;
+    } catch (e) {
+      if (e instanceof NotFoundException) {
+        throw e;
       } else {
         throw new InternalServerErrorException('알 수 없는 오류');
       }
