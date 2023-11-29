@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
+export class JwtAuthGuard extends AuthGuard('access') {
   handleRequest(err: any, user: any, info: any, context: any, status: any) {
     if (err || !user) {
       if (err instanceof BadRequestException) {

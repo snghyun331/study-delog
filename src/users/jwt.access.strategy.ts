@@ -5,11 +5,11 @@ import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class JwtStrategy extends PassportStrategy(Strategy, 'access') {
   constructor(private configService: ConfigService) {
     super();
   }
-  async validate(req) {
+  async validate(req: Request) {
     try {
       const userToken = req.headers['authorization']?.slice(7);
 
