@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository, DataSource } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>,
     private dataSource: DataSource,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async createUser(nickname: string, password: string, profileImg: string) {
@@ -27,7 +29,7 @@ export class UsersService {
       const result = await this.saveUserUsingQueryRunner(nickname, hashedPassword, profileImg);
       return result;
     } catch (e) {
-      // console.error(e);
+      console.error(e);
       if (e.code === '23505') {
         throw new ConflictException('이 닉네임은 이미 존재합니다. 다른 닉네임을 입력해주세요');
       } else {
@@ -39,11 +41,11 @@ export class UsersService {
   async userLogin(nickname: string, password: string) {
     try {
       const user = await this.usersRepository.findOne({ where: { nickname } });
-      // console.log(user)
       if (user && (await bcrypt.compare(password, user.password))) {
-        const payload = { userId: user.id };
-        const token = this.jwtService.sign(payload);
-        const result = { token, ...user };
+        const accessToken = await this.getAccessToken(user.id);
+        const refreshToken = await this.getRefreshToken(user.id);
+        await this.setCurrentRefreshToken(refreshToken, user.id);
+        const result = { accessToken, refreshToken };
         return result;
       } else {
         throw new UnauthorizedException('아이디 또는 비밀번호가 일치하지 않습니다.');
@@ -96,5 +98,40 @@ export class UsersService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    const isRefreshTokenMatching = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+  }
+
+  async getAccessToken(id: string) {
+    const payload = { userId: id };
+    const accessToken = await this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_SECRET_KEY'),
+      // expiresIn: Number(this.configService.get('JWT_ACCESS_EXPIRATION_TIME')),
+      expiresIn: +this.configService.get('JWT_ACCESS_EXPIRATION_TIME'),
+    });
+    return accessToken;
+  }
+
+  async getRefreshToken(id: string) {
+    const payload = { userId: id };
+    const refreshToken = await this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_REFRESH_SECRET_KEY'),
+      // expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION_TIME'),
+      expiresIn: 3000,
+    });
+
+    return refreshToken;
+  }
+
+  private async setCurrentRefreshToken(refreshToken: string, id: string) {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.usersRepository.update(id, { hashedRefreshToken });
   }
 }

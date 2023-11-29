@@ -6,6 +6,9 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  hashedRefreshToken: string;
+
   @Column({ type: 'varchar', nullable: false }) // 닉네임을 가입 아이디로
   nickname: string;
 

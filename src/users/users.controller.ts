@@ -1,5 +1,6 @@
 import { Controller, Post, Request, Get, Body, HttpCode, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from './authguards/jwt-auth.guard';
+import { JwtRefreshAuthGuard } from './authguards/jwt-refresh.auth.guard';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -39,6 +40,13 @@ export class UsersController {
   async getAuthUserInfo(@Request() req): Promise<{ message: string; result: any }> {
     const result = await this.usersService.getAuthUserInfo(req.user);
     return { message: '당신의 정보를 성공적으로 가져왔습니다.', result };
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @Get('/refresh')
+  async refresh(@Request() req): Promise<{ message: string; result: any }> {
+    const result = await this.usersService.getAccessToken(req.user.id);
+    return { message: '성공적으로 access 토큰이 갱신되었습니다', result };
   }
 
   // @Patch(':id')
