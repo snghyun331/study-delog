@@ -134,4 +134,8 @@ export class UsersService {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.usersRepository.update(id, { hashedRefreshToken });
   }
+
+  async removeRefreshToken(id: string) {
+    return this.usersRepository.update(id, { hashedRefreshToken: null });
+  }
 }

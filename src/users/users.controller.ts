@@ -15,7 +15,7 @@ export class UsersController {
   @ApiResponse({ status: 201, description: '회원가입 성공' })
   @ApiResponse({ status: 400, description: 'Validation Failed' })
   @ApiResponse({ status: 409, description: 'Conflict Error(닉네임 중복)' })
-  @Post('/signUp')
+  @Post('/signup')
   async create(@Body() createUserDto: CreateUserDto): Promise<{ message: string; result: any }> {
     const { nickname, password, profileImg } = createUserDto;
     const result = await this.usersService.createUser(nickname, password, profileImg);
@@ -27,7 +27,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '로그인 성공' })
   @ApiResponse({ status: 401, description: '로그인 실패(아이디 혹은 비번 불일치)' })
   @HttpCode(200)
-  @Post('/signIn')
+  @Post('/signin')
   async login(@Body() userLoginDto: UserLoginDto): Promise<{ message: string; result: any }> {
     const { nickname, password } = userLoginDto;
     const result = await this.usersService.userLogin(nickname, password);
@@ -45,8 +45,17 @@ export class UsersController {
   @UseGuards(JwtRefreshAuthGuard)
   @Get('/refresh')
   async refresh(@Request() req): Promise<{ message: string; result: any }> {
-    const result = await this.usersService.getAccessToken(req.user.id);
+    const accessToken = await this.usersService.getAccessToken(req.user.id);
+    const result = { accessToken };
     return { message: '성공적으로 access 토큰이 갱신되었습니다', result };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('/logout')
+  async logOut(@Request() req): Promise<{ message: string }> {
+    await this.usersService.removeRefreshToken(req.user);
+    return { message: '성공적으로 로그아웃 되었습니다.' };
   }
 
   // @Patch(':id')
