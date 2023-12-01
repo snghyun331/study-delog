@@ -5,11 +5,15 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserLoginDto } from './dto/user-login.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @ApiTags('USER')
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private authService: AuthService,
+  ) {}
 
   @ApiOperation({ summary: '유저 회원가입 API' })
   @ApiResponse({ status: 201, description: '회원가입 성공' })
@@ -45,7 +49,7 @@ export class UsersController {
   @UseGuards(JwtRefreshAuthGuard)
   @Get('/refresh')
   async refresh(@Request() req): Promise<{ message: string; result: any }> {
-    const accessToken = await this.usersService.getAccessToken(req.user.id);
+    const accessToken = await this.authService.getAccessToken(req.user.id);
     const result = { accessToken };
     return { message: '성공적으로 access 토큰이 갱신되었습니다', result };
   }
@@ -54,7 +58,7 @@ export class UsersController {
   @HttpCode(200)
   @Post('/logout')
   async logOut(@Request() req): Promise<{ message: string }> {
-    await this.usersService.removeRefreshToken(req.user);
+    await this.authService.removeRefreshToken(req.user);
     return { message: '성공적으로 로그아웃 되었습니다.' };
   }
 
