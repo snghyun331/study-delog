@@ -102,10 +102,16 @@ export class UsersService {
 
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
+    // user이 null일때
+    if (!user || !user.hashedRefreshToken) {
+      throw new UnauthorizedException('Access Denied');
+    }
     const isRefreshTokenMatching = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
 
     if (isRefreshTokenMatching) {
       return user;
+    } else {
+      throw new UnauthorizedException('Not Match');
     }
   }
 

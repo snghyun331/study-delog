@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -19,6 +19,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 
   async validate(req: Request, payload: any) {
     const refreshToken = req.headers['authorization']?.slice(7);
+    // if (!refreshToken) {
+    //   throw new UnauthorizedException('There is no access token in header');
+    // }
     // return { refreshToken, ...payload };
     return this.usersService.getUserIfRefreshTokenMatches(refreshToken, payload.userId);
   }
