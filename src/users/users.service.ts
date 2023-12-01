@@ -4,19 +4,16 @@ import {
   Injectable,
   ConflictException,
   InternalServerErrorException,
-  UnauthorizedException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
-import { Repository, DataSource } from 'typeorm';
-import { AuthService } from 'src/auth/auth.service';
+import { DataSource } from 'typeorm';
+import { AuthService } from './auth.service';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UserEntity)
-    private usersRepository: Repository<UserEntity>,
+    private usersRepository: UsersRepository,
     private dataSource: DataSource,
     private authService: AuthService,
   ) {}
@@ -43,7 +40,8 @@ export class UsersService {
 
   async getAuthUserInfo(userId: string) {
     try {
-      const user = await this.usersRepository.findOne({ where: { id: userId } });
+      // const user = await this.usersRepository.findOne({ where: { id: userId } });
+      const user = await this.usersRepository.findById(userId);
       if (!user) {
         throw new NotFoundException('유저가 존재하지 않습니다');
       }
@@ -64,10 +62,8 @@ export class UsersService {
     await queryRunner.startTransaction();
 
     try {
-      const user = new UserEntity();
-      user.nickname = nickname;
-      user.password = password;
-      user.profileImg = profileImg;
+      const newUser = { nickname, password, profileImg };
+      const user = await this.usersRepository.createUser({ newUser });
       const result = await queryRunner.manager.save(user);
       // throw new InternalServerErrorException(); // 트랜젹션 확인을 위해 일부러 에러를 발생시킴
 

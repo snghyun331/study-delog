@@ -5,7 +5,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserLoginDto } from './dto/user-login.dto';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from './auth.service';
 
 @ApiTags('USER')
 @Controller('users')
@@ -49,6 +49,7 @@ export class UsersController {
   @UseGuards(JwtRefreshAuthGuard)
   @Get('/refresh')
   async refresh(@Request() req): Promise<{ message: string; result: any }> {
+    console.log(req.user);
     const accessToken = await this.authService.getAccessToken(req.user.id);
     const result = { accessToken };
     return { message: '성공적으로 access 토큰이 갱신되었습니다', result };
