@@ -10,7 +10,7 @@ export class JwtAuthGuard extends AuthGuard('access') {
         throw err;
       }
       if (err instanceof TokenExpiredError) {
-        throw new UnauthorizedException('Token is expired');
+        throw new UnauthorizedException('Access Token is expired');
       }
       if (err instanceof JsonWebTokenError) {
         throw new BadRequestException(err.message);

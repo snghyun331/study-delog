@@ -50,24 +50,24 @@ export class AuthService {
     }
   }
 
-  // async getRefreshToken(id: string) {
-  //   try {
-  //     const user = await this.usersRepository.findById(id);
-  //     if (!user) {
-  //       throw new ForbiddenException('접근 권한이 없습니다.');
-  //     }
-  //     const payload = { userId: id };
-  //     const refreshToken = await this.jwtService.sign(payload, {
-  //       secret: this.configService.get('JWT_REFRESH_SECRET_KEY'),
-  //       expiresIn: 3000,
-  //     });
+  async getRefreshToken(id: string) {
+    try {
+      const user = await this.usersRepository.findById(id);
+      if (!user) {
+        throw new ForbiddenException('접근 권한이 없습니다.');
+      }
+      const payload = { userId: id };
+      const refreshToken = await this.jwtService.sign(payload, {
+        secret: this.configService.get('JWT_REFRESH_SECRET_KEY'),
+        expiresIn: 3000,
+      });
 
-  //     return refreshToken;
-  //   } catch (e) {
-  //     console.error(e);
-  //     if (e instanceof ForbiddenException) throw e;
-  //   }
-  // }
+      return refreshToken;
+    } catch (e) {
+      console.error(e);
+      if (e instanceof ForbiddenException) throw e;
+    }
+  }
 
   private async validateUserCredientials(nickname: string, password: string) {
     const user = await this.usersRepository.findByName(nickname);
@@ -106,38 +106,25 @@ export class AuthService {
   }
 
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
-    const user = await this.usersRepository.findById(userId);
-    if (!user || !user.hashedRefreshToken) {
-      throw new UnauthorizedException('엑세스가 거부되었습니다.');
-    }
-    const isRefreshTokenMatching = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+    try {
+      const user = await this.usersRepository.findById(userId);
 
-    if (isRefreshTokenMatching) {
-      return user;
-    } else {
-      throw new UnauthorizedException('Refresh 토큰이 사용자 것과 일치하지 않습니다.');
+      if (!user || !user.hashedRefreshToken) {
+        throw new UnauthorizedException('엑세스가 거부되었습니다.');
+      }
+
+      const isRefreshTokenMatching = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+
+      if (isRefreshTokenMatching) {
+        return user;
+      } else {
+        throw new UnauthorizedException('Refresh 토큰이 사용자 것과 일치하지 않습니다');
+      }
+    } catch (e) {
+      console.error(e);
+      if (e instanceof UnauthorizedException) {
+        throw e;
+      }
     }
   }
-  //   async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
-  //     try {
-  //       const user = await this.usersRepository.findById(userId);
-
-  //       if (!user || !user.hashedRefreshToken) {
-  //         throw new UnauthorizedException('Access Denied');
-  //       }
-
-  //       const isRefreshTokenMatching = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
-
-  //       if (isRefreshTokenMatching) {
-  //         return user;
-  //       } else {
-  //         throw new UnauthorizedException('Not Match');
-  //       }
-  //     } catch (e) {
-  //       console.error(e);
-  //       if (e instanceof UnauthorizedException) {
-  //         throw e; // UnauthorizedException은 그대로 던지기
-  //       }
-  //     }
-  //   }
 }

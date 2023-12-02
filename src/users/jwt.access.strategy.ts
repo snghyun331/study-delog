@@ -18,8 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'access') {
       }
 
       const secretKey = this.configService.get<string>('JWT_SECRET_KEY');
-      jwt.verify(userToken, secretKey);
-      const payload = jwt.decode(userToken);
+      const payload = jwt.verify(userToken, secretKey);
+      console.log(payload);
       const userId = payload['userId'];
       return userId;
     } catch (e) {

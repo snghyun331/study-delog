@@ -1,5 +1,3 @@
-import * as bcrypt from 'bcryptjs';
-import { SALT_ROUND } from 'src/utils/constant';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';

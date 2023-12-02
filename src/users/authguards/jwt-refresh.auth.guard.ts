@@ -10,7 +10,7 @@ export class JwtRefreshAuthGuard extends AuthGuard('refresh') {
         throw err;
       }
       if (err instanceof TokenExpiredError) {
-        throw new UnauthorizedException('Token is expired');
+        throw new UnauthorizedException('Refresh Token is expired. Please re-login');
       }
       if (err instanceof JsonWebTokenError) {
         throw new BadRequestException(err.message);

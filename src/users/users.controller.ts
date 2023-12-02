@@ -1,4 +1,13 @@
-import { Controller, Post, Request, Get, Body, HttpCode, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Request,
+  Get,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from './authguards/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './authguards/jwt-refresh.auth.guard';
 import { UsersService } from './users.service';
@@ -30,7 +39,7 @@ export class UsersController {
   @ApiOperation({ summary: '유저 로그인 API' })
   @ApiResponse({ status: 200, description: '로그인 성공' })
   @ApiResponse({ status: 401, description: '로그인 실패(아이디 혹은 비번 불일치)' })
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @Post('/signin')
   async login(@Body() userLoginDto: UserLoginDto): Promise<{ message: string; result: any }> {
     const { nickname, password } = userLoginDto;
@@ -56,7 +65,7 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @Post('/logout')
   async logOut(@Request() req): Promise<{ message: string }> {
     await this.authService.removeRefreshToken(req.user);
