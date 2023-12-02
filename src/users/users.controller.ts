@@ -7,7 +7,9 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh.auth.guard';
 import { UsersService } from './users.service';
@@ -41,10 +43,18 @@ export class UsersController {
   @ApiResponse({ status: 401, description: '로그인 실패(아이디 혹은 비번 불일치)' })
   @HttpCode(HttpStatus.OK)
   @Post('/signin')
-  async login(@Body() userLoginDto: UserLoginDto): Promise<{ message: string; result: any }> {
+  async login(
+    @Body() userLoginDto: UserLoginDto,
+    // @Res() res,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ message: string; result: any }> {
     const { nickname, password } = userLoginDto;
-    const result = await this.usersService.userLogin(nickname, password);
-
+    const { accessToken, accessOption, refreshToken, refreshOption } =
+      await this.usersService.userLogin(nickname, password);
+    res.cookie('Access', accessToken, accessOption);
+    res.cookie('Refresh', refreshToken, refreshOption);
+    const result = { accessToken, refreshToken };
+    // const result = await this.usersService.userLogin(nickname, password);
     return { message: '로그인 성공했습니다.', result };
   }
 
@@ -57,9 +67,14 @@ export class UsersController {
 
   @UseGuards(JwtRefreshAuthGuard)
   @Get('/refresh')
-  async refresh(@Request() req): Promise<{ message: string; result: any }> {
-    console.log(req.user);
-    const accessToken = await this.authService.getAccessToken(req.user.id);
+  async refresh(
+    @Request() req,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ message: string; result: any }> {
+    const { accessToken, ...accessOption } = await this.authService.getCookieWithAccessToken(
+      req.user.id,
+    );
+    res.cookie('Access', accessToken, accessOption);
     const result = { accessToken };
     return { message: '성공적으로 access 토큰이 갱신되었습니다', result };
   }

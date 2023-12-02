@@ -20,9 +20,17 @@ export class AuthService {
   async login(nickname: string, password: string) {
     try {
       const user = await this.validateUserCredientials(nickname, password);
-      const tokens = await this.getTokens(user.id);
-      await this.setCurrentRefreshToken(tokens.refrehToken, user.id);
-      return tokens;
+      const [accessTokenResult, refreshTokenResult] = await Promise.all([
+        this.getCookieWithAccessToken(user.id),
+        this.getCookieWithRefreshToken(user.id),
+      ]);
+
+      const { accessToken, ...accessOption } = accessTokenResult;
+      const { refreshToken, ...refreshOption } = refreshTokenResult;
+
+      await this.setCurrentRefreshToken(refreshToken, user.id);
+      const result = { accessToken, accessOption, refreshToken, refreshOption };
+      return result;
     } catch (e) {
       console.error(e);
       if (e instanceof UnauthorizedException) throw e;
@@ -32,37 +40,51 @@ export class AuthService {
     }
   }
 
-  async getAccessToken(id: string) {
+  async getCookieWithAccessToken(id: string) {
     try {
       const user = await this.usersRepository.findById(id);
       if (!user) {
         throw new ForbiddenException('접근 권한이 없습니다.');
       }
       const payload = { userId: id };
-      const accessToken = await this.jwtService.sign(payload, {
+      const token = await this.jwtService.sign(payload, {
         secret: this.configService.get('JWT_SECRET_KEY'),
         expiresIn: +this.configService.get('JWT_ACCESS_EXPIRATION_TIME'),
       });
-      return accessToken;
+      const result = {
+        accessToken: token,
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        maxAge: +this.configService.get('JWT_ACCESS_EXPIRATION_TIME') * 1000,
+      };
+      return result;
     } catch (e) {
       console.error(e);
       if (e instanceof ForbiddenException) throw e;
     }
   }
 
-  async getRefreshToken(id: string) {
+  async getCookieWithRefreshToken(id: string) {
     try {
       const user = await this.usersRepository.findById(id);
       if (!user) {
         throw new ForbiddenException('접근 권한이 없습니다.');
       }
       const payload = { userId: id };
-      const refreshToken = await this.jwtService.sign(payload, {
+      const token = await this.jwtService.sign(payload, {
         secret: this.configService.get('JWT_REFRESH_SECRET_KEY'),
-        expiresIn: 3000,
+        expiresIn: +this.configService.get('JWT_REFRESH_EXPIRATION_TIME'),
       });
 
-      return refreshToken;
+      const result = {
+        refreshToken: token,
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        maxAge: +this.configService.get('JWT_REFRESH_EXPIRATION_TIME') * 1000,
+      };
+      return result;
     } catch (e) {
       console.error(e);
       if (e instanceof ForbiddenException) throw e;
@@ -76,22 +98,6 @@ export class AuthService {
     } else {
       throw new UnauthorizedException('아이디 또는 비밀번호가 일치하지 않습니다.');
     }
-  }
-
-  private async getTokens(id: string) {
-    const payload = { userId: id };
-    const [at, rt] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: this.configService.get('JWT_SECRET_KEY'),
-        expiresIn: +this.configService.get('JWT_ACCESS_EXPIRATION_TIME'),
-      }),
-      this.jwtService.sign(payload, {
-        secret: this.configService.get('JWT_REFRESH_SECRET_KEY'),
-        expiresIn: 3000,
-      }),
-    ]);
-
-    return { accessToken: at, refrehToken: rt };
   }
 
   private async setCurrentRefreshToken(refreshToken: string, id: string) {
