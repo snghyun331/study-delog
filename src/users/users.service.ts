@@ -7,7 +7,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { AuthService } from './auth.service';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
@@ -15,7 +14,6 @@ export class UsersService {
   constructor(
     private usersRepository: UsersRepository,
     private dataSource: DataSource,
-    private authService: AuthService,
   ) {}
 
   async createUser(nickname: string, password: string, profileImg: string) {

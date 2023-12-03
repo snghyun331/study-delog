@@ -19,7 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'access') {
 
       const secretKey = this.configService.get<string>('JWT_SECRET_KEY');
       const payload = jwt.verify(userToken, secretKey);
-      console.log(payload);
       const userId = payload['userId'];
       return userId;
     } catch (e) {

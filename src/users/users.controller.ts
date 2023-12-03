@@ -87,8 +87,6 @@ export class UsersController {
     @Request() req,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string }> {
-    // const { accessOption, refreshOption } = await this.authService.getCookiesForLogout();
-    // await this.authService.removeRefreshToken(req.user);
     const { accessOption, refreshOption } = await this.authService.logout(req.user);
     res.cookie('Access', '', accessOption);
     res.cookie('Refresh', '', refreshOption);

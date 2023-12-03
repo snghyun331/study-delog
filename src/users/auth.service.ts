@@ -8,7 +8,6 @@ import { UsersRepository } from 'src/users/users.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
-import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +15,6 @@ export class AuthService {
     private usersRepository: UsersRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private dataSource: DataSource,
   ) {}
 
   async login(nickname: string, password: string) {
@@ -43,20 +41,13 @@ export class AuthService {
   }
 
   async logout(id: string) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
     try {
       await this.removeRefreshToken(id);
       const result = await this.getCookiesForLogout();
-      await queryRunner.commitTransaction();
       return result;
     } catch (e) {
       console.error(e);
-      await queryRunner.rollbackTransaction();
-      throw e;
-    } finally {
-      await queryRunner.release();
+      throw new InternalServerErrorException('알 수 없는 오류로 로그아웃하지 못했습니다.');
     }
   }
 
