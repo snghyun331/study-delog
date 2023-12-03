@@ -33,11 +33,6 @@ export class UsersService {
     }
   }
 
-  async userLogin(nickname: string, password: string) {
-    const result = this.authService.login(nickname, password);
-    return result;
-  }
-
   async getAuthUserInfo(userId: string) {
     try {
       // const user = await this.usersRepository.findOne({ where: { id: userId } });

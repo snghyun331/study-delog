@@ -8,6 +8,7 @@ import { UsersRepository } from 'src/users/users.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
     private usersRepository: UsersRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private dataSource: DataSource,
   ) {}
 
   async login(nickname: string, password: string) {
@@ -37,6 +39,24 @@ export class AuthService {
       else {
         throw new InternalServerErrorException('알 수 없는 오류');
       }
+    }
+  }
+
+  async logout(id: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await this.removeRefreshToken(id);
+      const result = await this.getCookiesForLogout();
+      await queryRunner.commitTransaction();
+      return result;
+    } catch (e) {
+      console.error(e);
+      await queryRunner.rollbackTransaction();
+      throw e;
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -91,6 +111,22 @@ export class AuthService {
     }
   }
 
+  private async getCookiesForLogout() {
+    return {
+      accessOption: {
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        maxAge: 0,
+      },
+      refreshOption: {
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        maxAge: 0,
+      },
+    };
+  }
   private async validateUserCredientials(nickname: string, password: string) {
     const user = await this.usersRepository.findByName(nickname);
     if (user && (await bcrypt.compare(password, user.password))) {

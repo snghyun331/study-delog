@@ -49,12 +49,13 @@ export class UsersController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string; result: any }> {
     const { nickname, password } = userLoginDto;
-    const { accessToken, accessOption, refreshToken, refreshOption } =
-      await this.usersService.userLogin(nickname, password);
+    const { accessToken, accessOption, refreshToken, refreshOption } = await this.authService.login(
+      nickname,
+      password,
+    );
     res.cookie('Access', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
     const result = { accessToken, refreshToken };
-    // const result = await this.usersService.userLogin(nickname, password);
     return { message: '로그인 성공했습니다.', result };
   }
 
@@ -82,8 +83,15 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('/logout')
-  async logOut(@Request() req): Promise<{ message: string }> {
-    await this.authService.removeRefreshToken(req.user);
+  async logOut(
+    @Request() req,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ message: string }> {
+    // const { accessOption, refreshOption } = await this.authService.getCookiesForLogout();
+    // await this.authService.removeRefreshToken(req.user);
+    const { accessOption, refreshOption } = await this.authService.logout(req.user);
+    res.cookie('Access', '', accessOption);
+    res.cookie('Refresh', '', refreshOption);
     return { message: '성공적으로 로그아웃 되었습니다.' };
   }
 
