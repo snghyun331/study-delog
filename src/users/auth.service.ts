@@ -1,7 +1,10 @@
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
+  LoggerService,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersRepository } from 'src/users/users.repository';
@@ -12,6 +15,7 @@ import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(Logger) private readonly logger: LoggerService,
     private usersRepository: UsersRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -32,7 +36,7 @@ export class AuthService {
       const result = { accessToken, accessOption, refreshToken, refreshOption };
       return result;
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       if (e instanceof UnauthorizedException) throw e;
       else {
         throw new InternalServerErrorException('알 수 없는 오류');
@@ -46,7 +50,7 @@ export class AuthService {
       const result = await this.getCookiesForLogout();
       return result;
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       throw new InternalServerErrorException('알 수 없는 오류로 로그아웃하지 못했습니다.');
     }
   }
@@ -71,7 +75,7 @@ export class AuthService {
       };
       return result;
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       if (e instanceof ForbiddenException) throw e;
     }
   }
@@ -97,7 +101,7 @@ export class AuthService {
       };
       return result;
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       if (e instanceof ForbiddenException) throw e;
     }
   }
@@ -154,7 +158,7 @@ export class AuthService {
         throw new UnauthorizedException('Refresh 토큰이 사용자 것과 일치하지 않습니다');
       }
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       if (e instanceof UnauthorizedException) {
         throw e;
       }

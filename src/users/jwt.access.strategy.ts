@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
 import * as jwt from 'jsonwebtoken';
@@ -6,7 +6,10 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'access') {
-  constructor(private configService: ConfigService) {
+  constructor(
+    @Inject(Logger) private readonly logger: LoggerService,
+    private configService: ConfigService,
+  ) {
     super();
   }
   async validate(req: Request) {
@@ -22,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'access') {
       const userId = payload['userId'];
       return userId;
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       throw e;
     }
   }
