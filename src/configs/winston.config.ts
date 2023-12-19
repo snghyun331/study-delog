@@ -1,20 +1,20 @@
 import { utilities, WinstonModule } from 'nest-winston';
-import * as winstonDaily from 'winston-daily-rotate-file';
 import * as winston from 'winston';
+// import * as winstonDaily from 'winston-daily-rotate-file';
 
 const env = process.env.NODE_ENV;
-const logDir = 'src/logs';
+// const logDir = 'src/logs';
 
-const dailyOptions = (level: string) => {
-  return {
-    level,
-    dataPattern: 'YYYY-MM-DD HH:mm:ss',
-    dirname: logDir + `${level}`,
-    filename: `%DATE%.${level}.log`,
-    maxFiles: 10, // 10일치 로그 파일 저장
-    zipeedArchive: true,
-  };
-};
+// const dailyOptions = (level: string) => {
+//   return {
+//     level,
+//     dataPattern: 'YYYY-MM-DD HH:mm:ss',
+//     dirname: logDir + `${level}`,
+//     filename: `%DATE%.${level}.log`,
+//     maxFiles: 10, // 10일치 로그 파일 저장
+//     zipeedArchive: true,
+//   };
+// };
 
 export const winstonLogger = WinstonModule.createLogger({
   transports: [
