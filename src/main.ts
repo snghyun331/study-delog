@@ -5,11 +5,14 @@ import { SwaggerConfig } from './configs/swagger.config';
 import { AppModule } from './app.module';
 import { SERVER_PORT, SERVER_PORT_2 } from './utils/constant';
 import { TransformInterceptor } from './interceptors/response.interceptor';
+import { winstonLogger } from './configs/winston.config';
 
 const port = SERVER_PORT || SERVER_PORT_2;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: winstonLogger,
+  });
 
   // use global pipe
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
