@@ -8,6 +8,9 @@ import {
   HttpStatus,
   UseGuards,
   Res,
+  Inject,
+  Logger,
+  LoggerService,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -22,6 +25,7 @@ import { AuthService } from './auth.service';
 @Controller('users')
 export class UsersController {
   constructor(
+    @Inject(Logger) private readonly logger: LoggerService,
     private usersService: UsersService,
     private authService: AuthService,
   ) {}

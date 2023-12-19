@@ -9,11 +9,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.access.strategy';
 import { JwtRefreshStrategy } from './jwt.refresh.strategy';
+import { Logger } from '@nestjs/common';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity]), PassportModule, JwtModule.register({})],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository, AuthService, JwtStrategy, JwtRefreshStrategy],
+  providers: [UsersService, UsersRepository, AuthService, JwtStrategy, JwtRefreshStrategy, Logger],
   exports: [JwtStrategy, JwtRefreshStrategy, PassportModule],
 })
 export class UsersModule {}
