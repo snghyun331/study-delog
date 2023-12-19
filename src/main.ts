@@ -7,6 +7,7 @@ import { SERVER_PORT, SERVER_PORT_2 } from './utils/constant';
 import { TransformInterceptor } from './interceptors/response.interceptor';
 import { winstonLogger } from './configs/winston.config';
 import * as morgan from 'morgan';
+
 const port = SERVER_PORT || SERVER_PORT_2;
 
 async function bootstrap() {
@@ -33,9 +34,9 @@ async function bootstrap() {
   // run server
   try {
     await app.listen(port);
-    console.log(`Server is listening on port ${port} successfully`);
+    winstonLogger.log(`Server is listening on port ${port} successfully`);
   } catch (error) {
-    console.error('Failed to start the app server');
+    winstonLogger.error('Failed to start the app server');
   }
 }
 

@@ -26,7 +26,6 @@ export class UsersService {
       const result = await this.saveUserUsingQueryRunner(nickname, hashedPassword, profileImg);
       return result;
     } catch (e) {
-      // console.error(e);
       this.logger.error(e);
       if (e.code === '23505') {
         throw new ConflictException('이 닉네임은 이미 존재합니다. 다른 닉네임을 입력해주세요');

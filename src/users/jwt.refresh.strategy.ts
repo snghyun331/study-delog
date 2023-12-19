@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
 import * as jwt from 'jsonwebtoken';
@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
   constructor(
+    @Inject(Logger) private readonly logger: LoggerService,
     private configService: ConfigService,
     private authService: AuthService,
   ) {
@@ -25,7 +26,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
       const userId = payload['userId'];
       return this.authService.getUserIfRefreshTokenMatches(refreshToken, userId);
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       throw e;
     }
   }

@@ -38,7 +38,6 @@ export class UsersController {
   async create(@Body() createUserDto: CreateUserDto): Promise<{ message: string; result: any }> {
     const { nickname, password, profileImg } = createUserDto;
     const result = await this.usersService.createUser(nickname, password, profileImg);
-
     return { message: '회원가입을 완료했습니다.', result };
   }
 
