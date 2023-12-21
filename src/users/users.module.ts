@@ -15,6 +15,6 @@ import { Logger } from '@nestjs/common';
   imports: [TypeOrmModule.forFeature([UserEntity]), PassportModule, JwtModule.register({})],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository, AuthService, JwtStrategy, JwtRefreshStrategy, Logger],
-  exports: [JwtStrategy, JwtRefreshStrategy, PassportModule],
+  exports: [JwtStrategy, JwtRefreshStrategy, PassportModule, UsersRepository],
 })
 export class UsersModule {}
