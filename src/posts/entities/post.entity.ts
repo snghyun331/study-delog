@@ -40,6 +40,6 @@ export class PostEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.posts, { eager: true })
-  user: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.posts, { nullable: false, eager: true })
+  user: UserEntity; // DB에 저장될 때는 자동으로 뒤에 Id가 붙음
 }
