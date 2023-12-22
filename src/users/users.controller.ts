@@ -35,7 +35,7 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Validation Failed' })
   @ApiResponse({ status: 409, description: 'Conflict Error(닉네임 중복)' })
   @Post('/signup')
-  async create(@Body() createUserDto: CreateUserDto): Promise<{ message: string; result: any }> {
+  async register(@Body() createUserDto: CreateUserDto): Promise<{ message: string; result: any }> {
     const { nickname, password, profileImg } = createUserDto;
     const result = await this.usersService.createUser(nickname, password, profileImg);
     return { message: '회원가입을 완료했습니다.', result };
@@ -64,14 +64,14 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/me')
-  async getAuthUserInfo(@Request() req): Promise<{ message: string; result: any }> {
-    const result = await this.usersService.getAuthUserInfo(req.user);
+  async readMyInfo(@Request() req): Promise<{ message: string; result: any }> {
+    const result = await this.usersService.getUserInfo(req.user);
     return { message: '당신의 정보를 성공적으로 가져왔습니다.', result };
   }
 
   @UseGuards(JwtRefreshAuthGuard)
   @Get('/refresh')
-  async refresh(
+  async refreshAccessToken(
     @Request() req,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string; result: any }> {

@@ -21,7 +21,7 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/')
-  async createPost(
+  async createNewePost(
     @Body() createPostDto: CreatePostDto,
     @GetUser() userId: string,
   ): Promise<{ message: string }> {
@@ -31,7 +31,7 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/me')
-  async readMine(@GetUser() userId: string): Promise<{ message: string; result: any }> {
+  async readMyPosts(@GetUser() userId: string): Promise<{ message: string; result: any }> {
     const result = await this.postsService.getMyPosts(userId);
     return { message: '성공적으로 내 포스트를 가져왔습니다', result };
   }

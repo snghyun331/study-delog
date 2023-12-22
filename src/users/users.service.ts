@@ -35,9 +35,8 @@ export class UsersService {
     }
   }
 
-  async getAuthUserInfo(userId: string) {
+  async getUserInfo(userId: string) {
     try {
-      // const user = await this.usersRepository.findOne({ where: { id: userId } });
       const user = await this.usersRepository.findById(userId);
       if (!user) {
         throw new NotFoundException('유저가 존재하지 않습니다');
@@ -62,7 +61,6 @@ export class UsersService {
       const newUser = { nickname, password, profileImg };
       const user = await this.usersRepository.createUser({ newUser });
       const result = await queryRunner.manager.save(user);
-      // throw new InternalServerErrorException(); // 트랜젹션 확인을 위해 일부러 에러를 발생시킴
 
       await queryRunner.commitTransaction();
       return result;

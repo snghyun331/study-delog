@@ -23,7 +23,7 @@ export class AuthService {
 
   async login(nickname: string, password: string) {
     try {
-      const user = await this.validateUserCredientials(nickname, password);
+      const user = await this.validateUserLogin(nickname, password);
       const [accessTokenResult, refreshTokenResult] = await Promise.all([
         this.getCookieWithAccessToken(user.id),
         this.getCookieWithRefreshToken(user.id),
@@ -32,7 +32,7 @@ export class AuthService {
       const { accessToken, ...accessOption } = accessTokenResult;
       const { refreshToken, ...refreshOption } = refreshTokenResult;
 
-      await this.setCurrentRefreshToken(refreshToken, user.id);
+      await this.hashAndSaveRefreshToken(refreshToken, user.id);
       const result = { accessToken, accessOption, refreshToken, refreshOption };
       return result;
     } catch (e) {
@@ -47,7 +47,7 @@ export class AuthService {
   async logout(id: string) {
     try {
       await this.removeRefreshToken(id);
-      const result = await this.getCookiesForLogout();
+      const result = await this.removeCookiesForLogOut();
       return result;
     } catch (e) {
       this.logger.error(e);
@@ -106,7 +106,7 @@ export class AuthService {
     }
   }
 
-  private async getCookiesForLogout() {
+  private async removeCookiesForLogOut() {
     return {
       accessOption: {
         domain: 'localhost',
@@ -122,7 +122,7 @@ export class AuthService {
       },
     };
   }
-  private async validateUserCredientials(nickname: string, password: string) {
+  private async validateUserLogin(nickname: string, password: string) {
     const user = await this.usersRepository.findByName(nickname);
     if (user && (await bcrypt.compare(password, user.password))) {
       return user;
@@ -131,13 +131,13 @@ export class AuthService {
     }
   }
 
-  private async setCurrentRefreshToken(refreshToken: string, id: string) {
+  private async hashAndSaveRefreshToken(refreshToken: string, id: string) {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     const updateDto = { hashedRefreshToken };
     return this.usersRepository.updateFields(id, updateDto);
   }
 
-  async removeRefreshToken(id: string) {
+  private async removeRefreshToken(id: string) {
     const updateDto = { hashedRefreshToken: null };
     return this.usersRepository.updateFields(id, updateDto);
   }
