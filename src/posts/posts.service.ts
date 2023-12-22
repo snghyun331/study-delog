@@ -4,17 +4,16 @@ import {
   InternalServerErrorException,
   Logger,
   LoggerService,
+  NotFoundException,
 } from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
 import { DataSource } from 'typeorm';
-import { UsersRepository } from 'src/users/users.repository';
 
 @Injectable()
 export class PostsService {
   constructor(
     @Inject(Logger) private readonly logger: LoggerService,
     private postsRepository: PostsRepository,
-    private usersRepository: UsersRepository,
     private dataSource: DataSource,
   ) {}
 
@@ -29,19 +28,17 @@ export class PostsService {
     }
   }
 
-  async getAll() {
-    const result = await this.postsRepository.findByRelation();
-    return result;
-  }
-
-  async getOne(postId) {
-    const result = await this.postsRepository.findOneByPostId(postId);
-    return result;
-  }
-
-  async getMine(userId) {
-    const result = await this.postsRepository.findByUserId(userId);
-    return result;
+  async getMyPosts(userId) {
+    try {
+      const posts = await this.postsRepository.findPostsByUserId(userId);
+      if (posts.length === 0) {
+        throw new NotFoundException('내 포스트가 존재하지 않습니다');
+      }
+      return posts;
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
   }
 
   private async savePostUsingQueryRunner(

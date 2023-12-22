@@ -22,34 +22,7 @@ export class PostsRepository {
     return post;
   }
 
-  async findByRelation2() {
-    // 현재 사용자가 작성한 모든 post entity들이 출력
-    const allInfo = await this.postsRepository.find({ relations: ['user'] });
-    return allInfo;
-  }
-
-  async findByRelation() {
-    // 현재 사용자가 작성한 모든 post entity들이 출력
-    const allInfo = await this.postsRepository.find();
-    return allInfo;
-  }
-
-  async findByPostId(postId) {
-    // 현재 사용자가 작성한 모든 post entity들이 출력
-    const post = await this.postsRepository.findOne({
-      where: { id: postId },
-      // relations: ['user'],
-    });
-    return post;
-  }
-
-  async findOneByPostId(postId) {
-    const post = await this.postsRepository.findOne({ where: { id: postId } });
-    console.log(post);
-    return post;
-  }
-
-  async findByUserId(userId) {
+  async findPostsByUserId(userId) {
     const post = await this.postsRepository.find({
       // relations: ['user'],
       where: {
@@ -60,4 +33,10 @@ export class PostsRepository {
     });
     return post;
   }
+
+  // async findByRelation2() {
+  //   // 현재 사용자가 작성한 모든 post entity들이 출력
+  //   const allInfo = await this.postsRepository.find({ relations: ['user'] });
+  //   return allInfo;
+  // }
 }
