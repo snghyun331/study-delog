@@ -24,20 +24,10 @@ export class PostsController {
   async create(
     @Body() createPostDto: CreatePostDto,
     @GetUser() userId: string,
-  ): Promise<{ message: string; result: any }> {
-    const result = await this.postsService.createPost(createPostDto, userId);
-    return { message: '포스팅을 완료했습니다', result };
+  ): Promise<{ message: string }> {
+    await this.postsService.createPost(createPostDto, userId);
+    return { message: '포스팅을 완료했습니다' };
   }
-
-  // @Get()
-  // findAll() {
-  //   return this.postsService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.postsService.findOne(+id);
-  // }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {

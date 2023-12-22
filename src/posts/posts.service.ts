@@ -21,17 +21,8 @@ export class PostsService {
   async createPost(createUserDto, userId) {
     try {
       const { title, category, content, thumbnail, isPublic } = createUserDto;
-      const post = await this.savePostUsingQueryRunner(
-        userId,
-        title,
-        category,
-        content,
-        thumbnail,
-        isPublic,
-      );
-      const postId = post.id;
-      const result = await this.postsRepository.findByPostId(postId);
-      return result;
+      await this.savePostUsingQueryRunner(userId, title, category, content, thumbnail, isPublic);
+      return;
     } catch (e) {
       this.logger.error(e);
       throw new InternalServerErrorException('알 수 없는 오류');
@@ -54,10 +45,9 @@ export class PostsService {
     try {
       const newPost = { userId, title, category, content, thumbnail, isPublic };
       const post = await this.postsRepository.createPost({ newPost });
-      const result = await queryRunner.manager.save(post);
-      // throw new InternalServerErrorException()
+      await queryRunner.manager.save(post);
       await queryRunner.commitTransaction();
-      return result;
+      return;
     } catch (e) {
       await queryRunner.rollbackTransaction();
       throw e;
