@@ -38,6 +38,21 @@ export class PostsService {
     }
   }
 
+  async getAll() {
+    const result = await this.postsRepository.findByRelation();
+    return result;
+  }
+
+  async getOne(postId) {
+    const result = await this.postsRepository.findOneByPostId(postId);
+    return result;
+  }
+
+  async getMine(userId) {
+    const result = await this.postsRepository.findByUserId(userId);
+    return result;
+  }
+
   private async savePostUsingQueryRunner(
     userId: string,
     title: string,
@@ -55,7 +70,6 @@ export class PostsService {
       const newPost = { userId, title, category, content, thumbnail, isPublic };
       const post = await this.postsRepository.createPost({ newPost });
       const result = await queryRunner.manager.save(post);
-      // throw new InternalServerErrorException()
       await queryRunner.commitTransaction();
       return result;
     } catch (e) {
