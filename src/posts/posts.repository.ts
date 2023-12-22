@@ -22,7 +22,7 @@ export class PostsRepository {
     return post;
   }
 
-  async findPostsByUserId(userId) {
+  async findPostsByUserId(userId: string) {
     const post = await this.postsRepository.find({
       // relations: ['user'],
       where: {
@@ -32,6 +32,15 @@ export class PostsRepository {
       },
     });
     return post;
+  }
+
+  async findPostByPostId(postId: string) {
+    const post = await this.postsRepository.findOne({ where: { id: postId } });
+    return post;
+  }
+
+  async updateFields(postId: string, updateFieldsDTO: object) {
+    return await this.postsRepository.update(postId, updateFieldsDTO);
   }
 
   // async findByRelation2() {

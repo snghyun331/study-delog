@@ -36,10 +36,16 @@ export class PostsController {
     return { message: '성공적으로 내 포스트를 가져왔습니다', result };
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-  //   return this.postsService.update(+id, updatePostDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Patch(':postId')
+  async updatePost(
+    @Param('postId') postId: string,
+    @GetUser() userId: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<{ message: string }> {
+    await this.postsService.updatePost(postId, userId, updatePostDto);
+    return { message: '성공적으로 포스트를 업데이트 했습니다' };
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

@@ -5,6 +5,7 @@ import {
   Logger,
   LoggerService,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
 import { DataSource } from 'typeorm';
@@ -41,6 +42,19 @@ export class PostsService {
     }
   }
 
+  async updatePost(postId, loginUserId, updatePostDto) {
+    try {
+      const isSameUser = await this.isSameUser(loginUserId, postId);
+      if (!isSameUser) {
+        throw new UnauthorizedException('포스트 수정 권한이 없습니다.');
+      }
+      await this.postsRepository.updateFields(postId, updatePostDto);
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
+  }
+
   private async savePostUsingQueryRunner(
     userId: string,
     title: string,
@@ -66,5 +80,11 @@ export class PostsService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  private async isSameUser(loginUserId, postId) {
+    const post = await this.postsRepository.findPostByPostId(postId);
+    const postWriterId = post.user.id;
+    return loginUserId == postWriterId;
   }
 }
